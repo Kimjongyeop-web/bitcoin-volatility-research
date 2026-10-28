@@ -1,0 +1,1397 @@
+{
+  "protocol": {
+    "date": "2026-10-15",
+    "target": "Next UTC-day log RV; 5-minute returns; fixed OLS, training-only Duan smearing.",
+    "factors": [
+      "log(BTC volume yesterday / mean BTC volume over preceding 30 days, excluding yesterday)",
+      "negative 5-minute squared-return sum yesterday / yesterday RV"
+    ],
+    "models": [
+      "HAR",
+      "Factors",
+      "HAR-X"
+    ],
+    "primary_loss": "QLIKE",
+    "secondary_loss": "MSE",
+    "validation": "2024-2025; train through 2023",
+    "test": "2026-01-01 through 2026-10-11; refit through 2025",
+    "common_sample_start": "31 days after first full UTC day; all models share dates; features strictly before target day",
+    "inference": "HAC 7 lags; sensitivity 1 and 30; Holm correction for two factor coefficients; joint robust Wald",
+    "bootstrap": "5000 circular moving-block samples of paired evaluation losses, blocks 7 and 30; fixed fitted forecasts, descriptive not nested-model p-values",
+    "sensitivity": "99% target/prior-day coverage subset; training Cook influence top 1% removal (diagnostic only); 10-minute RV target rerun",
+    "stationarity": "ADF AIC and KPSS auto on training variables; inspect warnings, no automatic differencing",
+    "selection": "No tuning from diagnostics or test. All three models reported. Annual splits descriptive.",
+    "limitations": "2026 already examined: retrospective. Upbit KRW local market. Conditional associations, not causal effects. RV measurement error; no new untouched test available."
+  },
+  "quality": {
+    "cache_files": 110,
+    "days": 3303,
+    "duplicate_rows": 0,
+    "invalid_volume_rows": 0,
+    "missing_minutes": 41965,
+    "minimum_daily_coverage": 0.46805555555555556,
+    "volume_missing_policy": "Sum observed trades only; never forward-fill volume. Missing candles may be no-trade intervals or acquisition gaps; cannot distinguish from cached candles alone."
+  },
+  "phases": {
+    "validation": {
+      "train_n": 2257,
+      "eval_n": 731,
+      "stationarity": {
+        "target_logRV": {
+          "adf_p": 0.003933583578998055,
+          "adf_lags": 27,
+          "kpss_p": 0.01,
+          "kpss_lags": 27,
+          "warnings": [
+            "adfuller currently returns a plain tuple whose length depends on the store and autolag arguments. In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning an ADFullerResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning.",
+            "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is smaller than the p-value returned.",
+            "kpss currently returns a plain tuple whose length and layout depends on the store argument (and which silently drops `lags` when store=True). In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning a KPSSResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning."
+          ]
+        },
+        "logRV_1d": {
+          "adf_p": 0.0032832975409683627,
+          "adf_lags": 27,
+          "kpss_p": 0.01,
+          "kpss_lags": 27,
+          "warnings": [
+            "adfuller currently returns a plain tuple whose length depends on the store and autolag arguments. In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning an ADFullerResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning.",
+            "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is smaller than the p-value returned.",
+            "kpss currently returns a plain tuple whose length and layout depends on the store argument (and which silently drops `lags` when store=True). In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning a KPSSResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning."
+          ]
+        },
+        "mean_logRV_7d": {
+          "adf_p": 0.00674404036330985,
+          "adf_lags": 27,
+          "kpss_p": 0.01,
+          "kpss_lags": 28,
+          "warnings": [
+            "adfuller currently returns a plain tuple whose length depends on the store and autolag arguments. In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning an ADFullerResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning.",
+            "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is smaller than the p-value returned.",
+            "kpss currently returns a plain tuple whose length and layout depends on the store argument (and which silently drops `lags` when store=True). In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning a KPSSResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning."
+          ]
+        },
+        "mean_logRV_30d": {
+          "adf_p": 0.02833255512713769,
+          "adf_lags": 27,
+          "kpss_p": 0.01,
+          "kpss_lags": 29,
+          "warnings": [
+            "adfuller currently returns a plain tuple whose length depends on the store and autolag arguments. In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning an ADFullerResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning.",
+            "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is smaller than the p-value returned.",
+            "kpss currently returns a plain tuple whose length and layout depends on the store argument (and which silently drops `lags` when store=True). In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning a KPSSResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning."
+          ]
+        },
+        "volume_shock": {
+          "adf_p": 3.135099637739372e-14,
+          "adf_lags": 27,
+          "kpss_p": 0.1,
+          "kpss_lags": 24,
+          "warnings": [
+            "adfuller currently returns a plain tuple whose length depends on the store and autolag arguments. In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning an ADFullerResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning.",
+            "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is greater than the p-value returned.",
+            "kpss currently returns a plain tuple whose length and layout depends on the store argument (and which silently drops `lags` when store=True). In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning a KPSSResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning."
+          ]
+        },
+        "downside_share": {
+          "adf_p": 0.0,
+          "adf_lags": 5,
+          "kpss_p": 0.1,
+          "kpss_lags": 5,
+          "warnings": [
+            "adfuller currently returns a plain tuple whose length depends on the store and autolag arguments. In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning an ADFullerResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning.",
+            "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is greater than the p-value returned.",
+            "kpss currently returns a plain tuple whose length and layout depends on the store argument (and which silently drops `lags` when store=True). In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning a KPSSResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning."
+          ]
+        }
+      },
+      "correlations": [
+        [
+          1.0,
+          0.8236935594784037,
+          0.6996357502203304,
+          0.5605177982684472,
+          0.011088338713974619
+        ],
+        [
+          0.8236935594784037,
+          1.0,
+          0.8596939812488525,
+          0.2435203526262687,
+          0.003029133869210469
+        ],
+        [
+          0.6996357502203304,
+          0.8596939812488524,
+          1.0,
+          0.050611904098668205,
+          0.004599276506731373
+        ],
+        [
+          0.5605177982684472,
+          0.24352035262626867,
+          0.05061190409866821,
+          1.0,
+          -0.007043153462311707
+        ],
+        [
+          0.011088338713974619,
+          0.003029133869210469,
+          0.004599276506731373,
+          -0.007043153462311707,
+          1.0
+        ]
+      ],
+      "vif": {
+        "logRV_1d": 5.813238989730796,
+        "mean_logRV_7d": 6.158292198929395,
+        "mean_logRV_30d": 4.560377057200163,
+        "volume_shock": 2.2119728286889995,
+        "downside_share": 1.000833536089601
+      },
+      "models": {
+        "HAR": {
+          "scores": {
+            "n": 731,
+            "qlike": 0.3381430269215662,
+            "mse": 2.5979365429791353e-06,
+            "mean_actual": 0.0006462343053600192,
+            "mean_prediction": 0.0006606650969303059,
+            "mean_error": 1.4430791570286658e-05,
+            "vol_mae_pct": 0.7090107460933815
+          },
+          "diagnostics": {
+            "coefficients_standardized": [
+              -7.223046341764131,
+              0.5801915030573527,
+              0.29084969013079537,
+              0.11855903280006293
+            ],
+            "hac7_se": [
+              0.014175698360882606,
+              0.0279266356421171,
+              0.03610714699964183,
+              0.03263646357686067
+            ],
+            "hac7_p": [
+              0.0,
+              7.407525410947985e-88,
+              1.2729212082955796e-15,
+              0.0002867200983719459
+            ],
+            "hac7_ci": [
+              [
+                -7.250845134036223,
+                -7.195247549492039
+              ],
+              [
+                0.5254268824150381,
+                0.6349561236996673
+              ],
+              [
+                0.2200429437238097,
+                0.361656436537781
+              ],
+              [
+                0.05455835725152067,
+                0.1825597083486052
+              ]
+            ],
+            "lb_p": [
+              0.005855284727483744,
+              4.7087179492877005e-11
+            ],
+            "arch_lm_p": 0.00017300491147375084,
+            "cusum_p": 0.28520943651988584,
+            "reset_hac_p": 0.11469003674329875,
+            "jarque_bera_p": 1.4905776624289696e-153,
+            "cook_max": 0.03542855003143526,
+            "cook_above_4n": 149,
+            "r2": 0.6578879639349265,
+            "hac_sensitivity": {
+              "1": [
+                0.0,
+                9.90510565536074e-83,
+                1.7021207454466239e-15,
+                8.531861955249413e-05
+              ],
+              "30": [
+                0.0,
+                2.473217948539787e-92,
+                8.469708889295283e-16,
+                0.0007944464567690685
+              ]
+            },
+            "warnings": [],
+            "terms": [
+              "constant",
+              "logRV_1d",
+              "mean_logRV_7d",
+              "mean_logRV_30d"
+            ]
+          },
+          "smearing": 1.3410493425443621,
+          "high_coverage_scores": {
+            "n": 709,
+            "qlike": 0.3428690180950623,
+            "mse": 2.677201107445652e-06,
+            "mean_actual": 0.0006574642932076049,
+            "mean_prediction": 0.0006687583890134235,
+            "mean_error": 1.1294095805818739e-05,
+            "vol_mae_pct": 0.7170192947669807
+          },
+          "influence_sensitivity_scores": {
+            "n": 731,
+            "qlike": 0.3401814472002419,
+            "mse": 2.576307473347291e-06,
+            "mean_actual": 0.0006462343053600192,
+            "mean_prediction": 0.0006163297097002585,
+            "mean_error": -2.9904595659760683e-05,
+            "vol_mae_pct": 0.6778770408379441
+          },
+          "calibration_actual_on_forecast": {
+            "coef": [
+              2.182213995846855,
+              0.6478515480294631
+            ],
+            "ci95": [
+              [
+                -0.28343341994495175,
+                4.647861411638662
+              ],
+              [
+                0.3954328814547369,
+                0.9002702146041893
+              ]
+            ]
+          },
+          "annual": {
+            "2024": {
+              "n": 366,
+              "qlike": 0.4097995483056723,
+              "mse": 4.957098215887047e-06,
+              "mean_actual": 0.000821046077271738,
+              "mean_prediction": 0.0007868453084858818,
+              "mean_error": -3.420076878585608e-05,
+              "vol_mae_pct": 0.8134297332493675
+            },
+            "2025": {
+              "n": 365,
+              "qlike": 0.2662901863007914,
+              "mse": 2.3231141343311975e-07,
+              "mean_actual": 0.00047094359708689857,
+              "mean_prediction": 0.0005341391861649886,
+              "mean_error": 6.319558907809007e-05,
+              "vol_mae_pct": 0.6043056795205297
+            }
+          }
+        },
+        "Factors": {
+          "scores": {
+            "n": 731,
+            "qlike": 0.7314563479097288,
+            "mse": 3.7277985479946285e-06,
+            "mean_actual": 0.0006462343053600192,
+            "mean_prediction": 0.0015527596661601606,
+            "mean_error": 0.0009065253608001413,
+            "vol_mae_pct": 1.7810119950015797
+          },
+          "diagnostics": {
+            "coefficients_standardized": [
+              -7.223046341764138,
+              0.44229097629722,
+              0.020335194339930467
+            ],
+            "hac7_se": [
+              0.05219140286841348,
+              0.035529010622255976,
+              0.02058728114036294
+            ],
+            "hac7_p": [
+              0.0,
+              1.8765631051334208e-34,
+              0.3233785626570411
+            ],
+            "hac7_ci": [
+              [
+                -7.325394570670549,
+                -7.120698112857727
+              ],
+              [
+                0.3726179820465575,
+                0.5119639705478825
+              ],
+              [
+                -0.020036814207663636,
+                0.06070720288752457
+              ]
+            ],
+            "lb_p": [
+              0.0,
+              0.0
+            ],
+            "arch_lm_p": 5.429569724049665e-178,
+            "cusum_p": 2.846027583143425e-56,
+            "reset_hac_p": 0.05285532916305976,
+            "jarque_bera_p": 6.532038264155167e-31,
+            "cook_max": 0.017798259555854023,
+            "cook_above_4n": 102,
+            "r2": 0.1483477751082939,
+            "hac_sensitivity": {
+              "1": [
+                0.0,
+                3.524789841734633e-60,
+                0.3259803451957043
+              ],
+              "30": [
+                0.0,
+                1.6931694257535643e-22,
+                0.3636751816311668
+              ]
+            },
+            "warnings": [],
+            "terms": [
+              "constant",
+              "volume_shock",
+              "downside_share"
+            ]
+          },
+          "smearing": 2.0328536693999686,
+          "high_coverage_scores": {
+            "n": 709,
+            "qlike": 0.7323064355728865,
+            "mse": 3.826431414804483e-06,
+            "mean_actual": 0.0006574642932076049,
+            "mean_prediction": 0.0015721414422930325,
+            "mean_error": 0.0009146771490854274,
+            "vol_mae_pct": 1.7920067882421922
+          },
+          "influence_sensitivity_scores": {
+            "n": 731,
+            "qlike": 0.699851122305452,
+            "mse": 3.504327823526041e-06,
+            "mean_actual": 0.0006462343053600192,
+            "mean_prediction": 0.0014622460591886422,
+            "mean_error": 0.000816011753828623,
+            "vol_mae_pct": 1.6865544709977884
+          },
+          "calibration_actual_on_forecast": {
+            "coef": [
+              1.318768938460931,
+              0.33125371731601394
+            ],
+            "ci95": [
+              [
+                -0.56110732340849,
+                3.198645200330352
+              ],
+              [
+                0.2324088174369815,
+                0.4300986171950464
+              ]
+            ]
+          },
+          "annual": {
+            "2024": {
+              "n": 366,
+              "qlike": 0.6106351495044039,
+              "mse": 5.726707788596384e-06,
+              "mean_actual": 0.000821046077271738,
+              "mean_prediction": 0.0015869690415882035,
+              "mean_error": 0.0007659229643164653,
+              "vol_mae_pct": 1.6387150478678065
+            },
+            "2025": {
+              "n": 365,
+              "qlike": 0.8526085632969861,
+              "mse": 1.7234128437199918e-06,
+              "mean_actual": 0.00047094359708689857,
+              "mean_prediction": 0.001518456566415877,
+              "mean_error": 0.001047512969328978,
+              "vol_mae_pct": 1.923698796785035
+            }
+          }
+        },
+        "HAR-X": {
+          "scores": {
+            "n": 731,
+            "qlike": 0.3327871504514422,
+            "mse": 2.5748927014430374e-06,
+            "mean_actual": 0.0006462343053600192,
+            "mean_prediction": 0.0006528893132714619,
+            "mean_error": 6.655007911442633e-06,
+            "vol_mae_pct": 0.6960443630380423
+          },
+          "diagnostics": {
+            "coefficients_standardized": [
+              -7.223046341764131,
+              0.4815490891752819,
+              0.3066300324013237,
+              0.1694493515710182,
+              0.0890601723905907,
+              0.010799588333993625
+            ],
+            "hac7_se": [
+              0.014234777058398682,
+              0.04150698299692857,
+              0.03710016300863886,
+              0.037244705561455024,
+              0.02760792774565942,
+              0.0159443868673165
+            ],
+            "hac7_p": [
+              0.0,
+              2.8820823989960353e-30,
+              2.357847781095048e-16,
+              5.659898918326209e-06,
+              0.0012738156578461105,
+              0.4982671286747822
+            ],
+            "hac7_ci": [
+              [
+                -7.250961001725867,
+                -7.195131681802395
+              ],
+              [
+                0.40015313111823714,
+                0.5629450472323266
+              ],
+              [
+                0.23387592949810493,
+                0.37938413530454246
+              ],
+              [
+                0.09641179805980529,
+                0.2424869050822311
+              ],
+              [
+                0.034920517648787314,
+                0.1431998271323941
+              ],
+              [
+                -0.020467647947511693,
+                0.04206682461549894
+              ]
+            ],
+            "lb_p": [
+              0.002567321708003088,
+              1.0631100105308441e-11
+            ],
+            "arch_lm_p": 0.00010886998854063637,
+            "cusum_p": 0.2161994377195248,
+            "reset_hac_p": 0.25605410955951396,
+            "jarque_bera_p": 6.167423434169682e-141,
+            "cook_max": 0.026485784141043817,
+            "cook_above_4n": 146,
+            "r2": 0.6606696151262169,
+            "hac_sensitivity": {
+              "1": [
+                0.0,
+                6.098376765045768e-32,
+                7.795565792520894e-17,
+                1.0990195018960824e-06,
+                0.000677744744380002,
+                0.49095428883302505
+              ],
+              "30": [
+                0.0,
+                1.944586251060099e-25,
+                3.1576458383160085e-16,
+                4.807963595456521e-05,
+                0.006065524752550312,
+                0.5225239894553597
+              ]
+            },
+            "warnings": [],
+            "terms": [
+              "constant",
+              "logRV_1d",
+              "mean_logRV_7d",
+              "mean_logRV_30d",
+              "volume_shock",
+              "downside_share"
+            ],
+            "factor_joint_wald_p": 0.004203203732127533,
+            "factor_holm_p": [
+              0.002547631315692221,
+              0.4982671286747822
+            ]
+          },
+          "smearing": 1.3336392836228368,
+          "high_coverage_scores": {
+            "n": 709,
+            "qlike": 0.3375118397494234,
+            "mse": 2.653651552064413e-06,
+            "mean_actual": 0.0006574642932076049,
+            "mean_prediction": 0.0006615064846042689,
+            "mean_error": 4.04219139666414e-06,
+            "vol_mae_pct": 0.704119049150442
+          },
+          "influence_sensitivity_scores": {
+            "n": 731,
+            "qlike": 0.33372379959115606,
+            "mse": 2.562460792304982e-06,
+            "mean_actual": 0.0006462343053600192,
+            "mean_prediction": 0.0006238815639966609,
+            "mean_error": -2.235274136335834e-05,
+            "vol_mae_pct": 0.6758766645519989
+          },
+          "calibration_actual_on_forecast": {
+            "coef": [
+              1.9094944117979964,
+              0.6973385150063236
+            ],
+            "ci95": [
+              [
+                -0.23729035502292883,
+                4.056279178618921
+              ],
+              [
+                0.4913687954479333,
+                0.9033082345647139
+              ]
+            ]
+          },
+          "annual": {
+            "2024": {
+              "n": 366,
+              "qlike": 0.4057655277298376,
+              "mse": 4.916060377765694e-06,
+              "mean_actual": 0.000821046077271738,
+              "mean_prediction": 0.0007781209443484282,
+              "mean_error": -4.2925132923309864e-05,
+              "vol_mae_pct": 0.7990117602458633
+            },
+            "2025": {
+              "n": 365,
+              "qlike": 0.2596088324133799,
+              "mse": 2.273108671030578e-07,
+              "mean_actual": 0.00047094359708689857,
+              "mean_prediction": 0.0005273145818353806,
+              "mean_error": 5.637098474848212e-05,
+              "vol_mae_pct": 0.5927948633721175
+            }
+          }
+        }
+      },
+      "Factors_minus_HAR": {
+        "QLIKE": {
+          "7": {
+            "mean": 0.3933133209881625,
+            "ci95": [
+              0.2699917540024357,
+              0.4984505017105609
+            ]
+          },
+          "30": {
+            "mean": 0.3933133209881625,
+            "ci95": [
+              0.22074897711312333,
+              0.5645762196563343
+            ]
+          }
+        },
+        "MSE": {
+          "7": {
+            "mean": 1.1298620050154934e-06,
+            "ci95": [
+              7.724052883343238e-07,
+              1.4405623195087198e-06
+            ]
+          },
+          "30": {
+            "mean": 1.1298620050154934e-06,
+            "ci95": [
+              6.697972315444327e-07,
+              1.5446242887834316e-06
+            ]
+          }
+        }
+      },
+      "HAR-X_minus_HAR": {
+        "QLIKE": {
+          "7": {
+            "mean": -0.005355876470124102,
+            "ci95": [
+              -0.008596298112239815,
+              -0.002065279444738572
+            ]
+          },
+          "30": {
+            "mean": -0.005355876470124102,
+            "ci95": [
+              -0.008618962466995339,
+              -0.0022916762598903383
+            ]
+          }
+        },
+        "MSE": {
+          "7": {
+            "mean": -2.3043841536097833e-08,
+            "ci95": [
+              -5.7603471092595753e-08,
+              -4.2454447839355235e-09
+            ]
+          },
+          "30": {
+            "mean": -2.3043841536097833e-08,
+            "ci95": [
+              -5.8102647779332824e-08,
+              -3.351114981163608e-09
+            ]
+          }
+        }
+      }
+    },
+    "test": {
+      "train_n": 2988,
+      "eval_n": 284,
+      "stationarity": {
+        "target_logRV": {
+          "adf_p": 0.0004045640136998027,
+          "adf_lags": 28,
+          "kpss_p": 0.01,
+          "kpss_lags": 30,
+          "warnings": [
+            "adfuller currently returns a plain tuple whose length depends on the store and autolag arguments. In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning an ADFullerResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning.",
+            "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is smaller than the p-value returned.",
+            "kpss currently returns a plain tuple whose length and layout depends on the store argument (and which silently drops `lags` when store=True). In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning a KPSSResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning."
+          ]
+        },
+        "logRV_1d": {
+          "adf_p": 0.0005320766082863843,
+          "adf_lags": 28,
+          "kpss_p": 0.01,
+          "kpss_lags": 30,
+          "warnings": [
+            "adfuller currently returns a plain tuple whose length depends on the store and autolag arguments. In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning an ADFullerResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning.",
+            "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is smaller than the p-value returned.",
+            "kpss currently returns a plain tuple whose length and layout depends on the store argument (and which silently drops `lags` when store=True). In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning a KPSSResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning."
+          ]
+        },
+        "mean_logRV_7d": {
+          "adf_p": 0.0021484950332075086,
+          "adf_lags": 29,
+          "kpss_p": 0.01,
+          "kpss_lags": 31,
+          "warnings": [
+            "adfuller currently returns a plain tuple whose length depends on the store and autolag arguments. In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning an ADFullerResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning.",
+            "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is smaller than the p-value returned.",
+            "kpss currently returns a plain tuple whose length and layout depends on the store argument (and which silently drops `lags` when store=True). In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning a KPSSResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning."
+          ]
+        },
+        "mean_logRV_30d": {
+          "adf_p": 0.03434588523800713,
+          "adf_lags": 29,
+          "kpss_p": 0.01,
+          "kpss_lags": 32,
+          "warnings": [
+            "adfuller currently returns a plain tuple whose length depends on the store and autolag arguments. In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning an ADFullerResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning.",
+            "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is smaller than the p-value returned.",
+            "kpss currently returns a plain tuple whose length and layout depends on the store argument (and which silently drops `lags` when store=True). In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning a KPSSResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning."
+          ]
+        },
+        "volume_shock": {
+          "adf_p": 4.864174463889687e-18,
+          "adf_lags": 28,
+          "kpss_p": 0.08370443142146677,
+          "kpss_lags": 26,
+          "warnings": [
+            "adfuller currently returns a plain tuple whose length depends on the store and autolag arguments. In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning an ADFullerResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning.",
+            "kpss currently returns a plain tuple whose length and layout depends on the store argument (and which silently drops `lags` when store=True). In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning a KPSSResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning."
+          ]
+        },
+        "downside_share": {
+          "adf_p": 0.0,
+          "adf_lags": 5,
+          "kpss_p": 0.1,
+          "kpss_lags": 5,
+          "warnings": [
+            "adfuller currently returns a plain tuple whose length depends on the store and autolag arguments. In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning an ADFullerResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning.",
+            "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is greater than the p-value returned.",
+            "kpss currently returns a plain tuple whose length and layout depends on the store argument (and which silently drops `lags` when store=True). In release 0.16 or after July 2027, whichever is later, the default behavior will switch to always returning a KPSSResult. Set result_object=True to switch now, or result_object=False to keep the current behavior and silence this warning."
+          ]
+        }
+      },
+      "correlations": [
+        [
+          1.0,
+          0.8079291530075919,
+          0.6875606668348764,
+          0.5803185844057543,
+          0.02818997444761873
+        ],
+        [
+          0.8079291530075919,
+          0.9999999999999999,
+          0.8580523731240955,
+          0.22609867744704246,
+          0.02025056520768622
+        ],
+        [
+          0.6875606668348765,
+          0.8580523731240955,
+          1.0,
+          0.030384945459359804,
+          0.023414774701804655
+        ],
+        [
+          0.5803185844057543,
+          0.22609867744704246,
+          0.030384945459359804,
+          0.9999999999999998,
+          -0.008412351731656584
+        ],
+        [
+          0.028189974447618726,
+          0.02025056520768622,
+          0.023414774701804655,
+          -0.008412351731656584,
+          1.0
+        ]
+      ],
+      "vif": {
+        "logRV_1d": 6.114138375478704,
+        "mean_logRV_7d": 5.841413074487104,
+        "mean_logRV_30d": 4.680918898262811,
+        "volume_shock": 2.5038822749558873,
+        "downside_share": 1.0022680149657424
+      },
+      "models": {
+        "HAR": {
+          "scores": {
+            "n": 284,
+            "qlike": 0.21397297623279524,
+            "mse": 1.5487943123992406e-07,
+            "mean_actual": 0.0004624225295338601,
+            "mean_prediction": 0.0005394761310062096,
+            "mean_error": 7.705360147234962e-05,
+            "vol_mae_pct": 0.5221414622497883
+          },
+          "diagnostics": {
+            "coefficients_standardized": [
+              -7.385545095503785,
+              0.5554519177843743,
+              0.3022303901661663,
+              0.11367732506330785
+            ],
+            "hac7_se": [
+              0.01240395028736803,
+              0.022976892370875683,
+              0.02995984898732085,
+              0.02756247103588146
+            ],
+            "hac7_p": [
+              0.0,
+              4.633813666671147e-118,
+              1.48511149069005e-23,
+              3.819306744873665e-05
+            ],
+            "hac7_ci": [
+              [
+                -7.409866256370112,
+                -7.361223934637458
+              ],
+              [
+                0.5103997624133999,
+                0.6005040731553487
+              ],
+              [
+                0.24348633767721484,
+                0.3609744426551178
+              ],
+              [
+                0.05963395368509266,
+                0.16772069644152304
+              ]
+            ],
+            "lb_p": [
+              6.68607611157517e-17,
+              6.92583952190875e-72
+            ],
+            "arch_lm_p": 3.914403943387516e-07,
+            "cusum_p": 0.06240919211605583,
+            "reset_hac_p": 0.05778179130543468,
+            "jarque_bera_p": 4.657246606412684e-167,
+            "cook_max": 0.02865408249317278,
+            "cook_above_4n": 192,
+            "r2": 0.6348659702382347,
+            "hac_sensitivity": {
+              "1": [
+                0.0,
+                2.52783384796289e-109,
+                7.509692842578586e-22,
+                1.7273820250016545e-05
+              ],
+              "30": [
+                0.0,
+                1.9049824288759905e-127,
+                6.419321748269125e-24,
+                0.00011500930344507051
+              ]
+            },
+            "warnings": [],
+            "terms": [
+              "constant",
+              "logRV_1d",
+              "mean_logRV_7d",
+              "mean_logRV_30d"
+            ]
+          },
+          "smearing": 1.3567044179357315,
+          "high_coverage_scores": {
+            "n": 279,
+            "qlike": 0.2136859181244022,
+            "mse": 1.570249454782753e-07,
+            "mean_actual": 0.0004648386644731367,
+            "mean_prediction": 0.0005433402003203537,
+            "mean_error": 7.850153584721706e-05,
+            "vol_mae_pct": 0.5234065098485344
+          },
+          "influence_sensitivity_scores": {
+            "n": 284,
+            "qlike": 0.207347067664666,
+            "mse": 1.5100696071207305e-07,
+            "mean_actual": 0.0004624225295338601,
+            "mean_prediction": 0.0005047119968088624,
+            "mean_error": 4.2289467275002364e-05,
+            "vol_mae_pct": 0.4932337590209555
+          },
+          "calibration_actual_on_forecast": {
+            "coef": [
+              -0.42420271403076154,
+              0.935801923238611
+            ],
+            "ci95": [
+              [
+                -1.6608711225206043,
+                0.8124656944590811
+              ],
+              [
+                0.623511791657689,
+                1.2480920548195331
+              ]
+            ]
+          },
+          "annual": {
+            "2026": {
+              "n": 284,
+              "qlike": 0.21397297623279524,
+              "mse": 1.5487943123992406e-07,
+              "mean_actual": 0.0004624225295338601,
+              "mean_prediction": 0.0005394761310062096,
+              "mean_error": 7.705360147234962e-05,
+              "vol_mae_pct": 0.5221414622497883
+            }
+          }
+        },
+        "Factors": {
+          "scores": {
+            "n": 284,
+            "qlike": 0.7254993654640692,
+            "mse": 1.133125972280109e-06,
+            "mean_actual": 0.0004624225295338601,
+            "mean_prediction": 0.001337143553696298,
+            "mean_error": 0.0008747210241624381,
+            "vol_mae_pct": 1.665159818673187
+          },
+          "diagnostics": {
+            "coefficients_standardized": [
+              -7.385545095503794,
+              0.4389734034175137,
+              0.03697075396926354
+            ],
+            "hac7_se": [
+              0.044310798288128596,
+              0.03037661606913631,
+              0.018533381890344015
+            ],
+            "hac7_p": [
+              0.0,
+              8.379867432230225e-46,
+              0.04615333372517875
+            ],
+            "hac7_ci": [
+              [
+                -7.472427893468457,
+                -7.29866229753913
+              ],
+              [
+                0.3794121790941866,
+                0.49853462774084073
+              ],
+              [
+                0.0006312580317210381,
+                0.07331024990680604
+              ]
+            ],
+            "lb_p": [
+              0.0,
+              0.0
+            ],
+            "arch_lm_p": 1.2063496362532198e-228,
+            "cusum_p": 1.7143524930043115e-113,
+            "reset_hac_p": 0.03436249385084419,
+            "jarque_bera_p": 2.0783059891514354e-43,
+            "cook_max": 0.015236102079834857,
+            "cook_above_4n": 136,
+            "r2": 0.1482590548430437,
+            "hac_sensitivity": {
+              "1": [
+                0.0,
+                1.0687519033397026e-80,
+                0.04239258840784551
+              ],
+              "30": [
+                0.0,
+                2.0308906275999022e-29,
+                0.07139409909905133
+              ]
+            },
+            "warnings": [],
+            "terms": [
+              "constant",
+              "volume_shock",
+              "downside_share"
+            ]
+          },
+          "smearing": 2.021699902516849,
+          "high_coverage_scores": {
+            "n": 279,
+            "qlike": 0.7257609625212655,
+            "mse": 1.145638319601686e-06,
+            "mean_actual": 0.0004648386644731367,
+            "mean_prediction": 0.0013447378078689544,
+            "mean_error": 0.0008798991433958175,
+            "vol_mae_pct": 1.6713661350023585
+          },
+          "influence_sensitivity_scores": {
+            "n": 284,
+            "qlike": 0.6745592578226197,
+            "mse": 8.933188942462107e-07,
+            "mean_actual": 0.0004624225295338601,
+            "mean_prediction": 0.0012269008566989468,
+            "mean_error": 0.0007644783271650868,
+            "vol_mae_pct": 1.531556814643153
+          },
+          "calibration_actual_on_forecast": {
+            "coef": [
+              -1.0991278120731505,
+              0.42802832138632774
+            ],
+            "ci95": [
+              [
+                -4.381377891149063,
+                2.1831222670027612
+              ],
+              [
+                0.1404951900635149,
+                0.7155614527091405
+              ]
+            ]
+          },
+          "annual": {
+            "2026": {
+              "n": 284,
+              "qlike": 0.7254993654640692,
+              "mse": 1.133125972280109e-06,
+              "mean_actual": 0.0004624225295338601,
+              "mean_prediction": 0.001337143553696298,
+              "mean_error": 0.0008747210241624381,
+              "vol_mae_pct": 1.665159818673187
+            }
+          }
+        },
+        "HAR-X": {
+          "scores": {
+            "n": 284,
+            "qlike": 0.2115612456700903,
+            "mse": 1.4627968593735234e-07,
+            "mean_actual": 0.0004624225295338601,
+            "mean_prediction": 0.0005358364604796151,
+            "mean_error": 7.341393094575512e-05,
+            "vol_mae_pct": 0.5130688274680566
+          },
+          "diagnostics": {
+            "coefficients_standardized": [
+              -7.385545095503785,
+              0.4278779916511599,
+              0.3226993516817953,
+              0.1801580231334725,
+              0.11201679829193839,
+              0.011405206568511218
+            ],
+            "hac7_se": [
+              0.012482282708908292,
+              0.039629605159501965,
+              0.031127003727768526,
+              0.033895704040529266,
+              0.02711845344874729,
+              0.01413875635022608
+            ],
+            "hac7_p": [
+              0.0,
+              1.1012723321319528e-26,
+              9.16381640122074e-25,
+              1.1447719158833306e-07,
+              3.716823285168683e-05,
+              0.4199252007984712
+            ],
+            "hac7_ci": [
+              [
+                -7.410019854054865,
+                -7.361070336952705
+              ],
+              [
+                0.35017385368437254,
+                0.5055821296179474
+              ],
+              [
+                0.2616667730724346,
+                0.38373193029115604
+              ],
+              [
+                0.1136966881631652,
+                0.24661935810377983
+              ],
+              [
+                0.05884402405545032,
+                0.16518957252842648
+              ],
+              [
+                -0.016317498961733977,
+                0.039127912098756414
+              ]
+            ],
+            "lb_p": [
+              1.4486619496704286e-18,
+              2.3408192664184683e-76
+            ],
+            "arch_lm_p": 8.351979298108137e-07,
+            "cusum_p": 0.0846438515375387,
+            "reset_hac_p": 0.23234631631679126,
+            "jarque_bera_p": 3.552746015017864e-153,
+            "cook_max": 0.0202457535555099,
+            "cook_above_4n": 187,
+            "r2": 0.6387596663875934,
+            "hac_sensitivity": {
+              "1": [
+                0.0,
+                7.256152949370978e-30,
+                3.4777435995249234e-24,
+                1.0282889837511163e-08,
+                6.168065852849158e-06,
+                0.40941962955945804
+              ],
+              "30": [
+                0.0,
+                6.912691259096997e-20,
+                4.167464014873502e-24,
+                3.964746817763814e-06,
+                0.0008798137888751113,
+                0.4421481269060628
+              ]
+            },
+            "warnings": [],
+            "terms": [
+              "constant",
+              "logRV_1d",
+              "mean_logRV_7d",
+              "mean_logRV_30d",
+              "volume_shock",
+              "downside_share"
+            ],
+            "factor_joint_wald_p": 0.00014565659596916546,
+            "factor_holm_p": [
+              7.433646570337367e-05,
+              0.4199252007984712
+            ]
+          },
+          "smearing": 1.3484029490934162,
+          "high_coverage_scores": {
+            "n": 279,
+            "qlike": 0.2110937999156109,
+            "mse": 1.482435344572846e-07,
+            "mean_actual": 0.0004648386644731367,
+            "mean_prediction": 0.0005395687075298146,
+            "mean_error": 7.4730043056678e-05,
+            "vol_mae_pct": 0.5143101012164538
+          },
+          "influence_sensitivity_scores": {
+            "n": 284,
+            "qlike": 0.20620706103456024,
+            "mse": 1.4231572889167008e-07,
+            "mean_actual": 0.0004624225295338601,
+            "mean_prediction": 0.0005072075921566091,
+            "mean_error": 4.4785062622749094e-05,
+            "vol_mae_pct": 0.4907986541344457
+          },
+          "calibration_actual_on_forecast": {
+            "coef": [
+              -0.38907855040723976,
+              0.9356033445836336
+            ],
+            "ci95": [
+              [
+                -1.4452020754326371,
+                0.6670449746181575
+              ],
+              [
+                0.6649275528170655,
+                1.2062791363502017
+              ]
+            ]
+          },
+          "annual": {
+            "2026": {
+              "n": 284,
+              "qlike": 0.2115612456700903,
+              "mse": 1.4627968593735234e-07,
+              "mean_actual": 0.0004624225295338601,
+              "mean_prediction": 0.0005358364604796151,
+              "mean_error": 7.341393094575512e-05,
+              "vol_mae_pct": 0.5130688274680566
+            }
+          }
+        }
+      },
+      "Factors_minus_HAR": {
+        "QLIKE": {
+          "7": {
+            "mean": 0.5115263892312739,
+            "ci95": [
+              0.39907174834100145,
+              0.6211784687620663
+            ]
+          },
+          "30": {
+            "mean": 0.5115263892312739,
+            "ci95": [
+              0.32411863064171215,
+              0.6928802508084134
+            ]
+          }
+        },
+        "MSE": {
+          "7": {
+            "mean": 9.78246541040185e-07,
+            "ci95": [
+              7.344133650450464e-07,
+              1.2909567740676886e-06
+            ]
+          },
+          "30": {
+            "mean": 9.78246541040185e-07,
+            "ci95": [
+              6.405590802299392e-07,
+              1.3683969414814767e-06
+            ]
+          }
+        }
+      },
+      "HAR-X_minus_HAR": {
+        "QLIKE": {
+          "7": {
+            "mean": -0.002411730562704949,
+            "ci95": [
+              -0.0068747473946769765,
+              0.0019281826093858504
+            ]
+          },
+          "30": {
+            "mean": -0.002411730562704949,
+            "ci95": [
+              -0.008430784210963802,
+              0.003474314085137698
+            ]
+          }
+        },
+        "MSE": {
+          "7": {
+            "mean": -8.599745302571758e-09,
+            "ci95": [
+              -2.0673041049772158e-08,
+              -6.480138869342484e-10
+            ]
+          },
+          "30": {
+            "mean": -8.599745302571758e-09,
+            "ci95": [
+              -2.1956622641813644e-08,
+              1.8449448220161903e-10
+            ]
+          }
+        }
+      }
+    }
+  },
+  "rv10_sensitivity": {
+    "validation": {
+      "HAR": {
+        "n": 731,
+        "qlike": 0.33287514949174285,
+        "mse": 1.2401858614081878e-06,
+        "mean_actual": 0.000605280735885457,
+        "mean_prediction": 0.000649353312596759,
+        "mean_error": 4.407257671130208e-05,
+        "vol_mae_pct": 0.725394522047447
+      },
+      "Factors": {
+        "n": 731,
+        "qlike": 0.7267453692130638,
+        "mse": 2.3123867882469864e-06,
+        "mean_actual": 0.000605280735885457,
+        "mean_prediction": 0.0014904700985777788,
+        "mean_error": 0.0008851893626923216,
+        "vol_mae_pct": 1.744463402279398
+      },
+      "HAR-X": {
+        "n": 731,
+        "qlike": 0.32559120956264076,
+        "mse": 1.2218644229900147e-06,
+        "mean_actual": 0.000605280735885457,
+        "mean_prediction": 0.0006402560435134209,
+        "mean_error": 3.497530762796397e-05,
+        "vol_mae_pct": 0.7083554554866414
+      }
+    },
+    "test": {
+      "HAR": {
+        "n": 284,
+        "qlike": 0.2364492597899602,
+        "mse": 1.8490966869037658e-07,
+        "mean_actual": 0.00045586100960096223,
+        "mean_prediction": 0.0005361153627709902,
+        "mean_error": 8.025435317002803e-05,
+        "vol_mae_pct": 0.5590396123912846
+      },
+      "Factors": {
+        "n": 284,
+        "qlike": 0.7230310648807954,
+        "mse": 1.0310823233713214e-06,
+        "mean_actual": 0.00045586100960096223,
+        "mean_prediction": 0.0012820819384562448,
+        "mean_error": 0.0008262209288552827,
+        "vol_mae_pct": 1.6124365367818174
+      },
+      "HAR-X": {
+        "n": 284,
+        "qlike": 0.23368618509606295,
+        "mse": 1.6937332557193473e-07,
+        "mean_actual": 0.00045586100960096223,
+        "mean_prediction": 0.000532175087690882,
+        "mean_error": 7.631407808991973e-05,
+        "vol_mae_pct": 0.5476050563683582
+      }
+    }
+  },
+  "rolling_coefficient_diagnostic": [
+    {
+      "cutoff": 2021,
+      "n": 1096,
+      "factor_coef_original_units": [
+        0.2319822618295769,
+        0.25306249524654223
+      ],
+      "ci95_original_units": [
+        [
+          0.10458065221318716,
+          0.3593838714459666
+        ],
+        [
+          -0.2240407320163961,
+          0.7301657225094806
+        ]
+      ]
+    },
+    {
+      "cutoff": 2022,
+      "n": 1096,
+      "factor_coef_original_units": [
+        0.3172007687232454,
+        0.22966340647915967
+      ],
+      "ci95_original_units": [
+        [
+          0.17831421863806657,
+          0.4560873188084242
+        ],
+        [
+          -0.276100081092317,
+          0.7354268940506364
+        ]
+      ]
+    },
+    {
+      "cutoff": 2023,
+      "n": 1096,
+      "factor_coef_original_units": [
+        0.29662916504283376,
+        0.37569300170097236
+      ],
+      "ci95_original_units": [
+        [
+          0.16319158374350168,
+          0.43006674634216585
+        ],
+        [
+          -0.1451695507603106,
+          0.8965555541622554
+        ]
+      ]
+    },
+    {
+      "cutoff": 2024,
+      "n": 1095,
+      "factor_coef_original_units": [
+        0.26242222182522384,
+        -0.034958388348396215
+      ],
+      "ci95_original_units": [
+        [
+          0.12479904278590825,
+          0.40004540086453944
+        ],
+        [
+          -0.534932883735791,
+          0.46501610703899854
+        ]
+      ]
+    },
+    {
+      "cutoff": 2025,
+      "n": 1096,
+      "factor_coef_original_units": [
+        0.30621067747598707,
+        -0.31624565146053824
+      ],
+      "ci95_original_units": [
+        [
+          0.15219953142875242,
+          0.4602218235232216
+        ],
+        [
+          -0.8442477711104787,
+          0.21175646818940214
+        ]
+      ]
+    },
+    {
+      "cutoff": 2026,
+      "n": 1096,
+      "factor_coef_original_units": [
+        0.3225021751634108,
+        -0.3928929951202013
+      ],
+      "ci95_original_units": [
+        [
+          0.17682590770827408,
+          0.46817844261854746
+        ],
+        [
+          -1.0309007036620172,
+          0.24511471342161456
+        ]
+      ]
+    }
+  ]
+}

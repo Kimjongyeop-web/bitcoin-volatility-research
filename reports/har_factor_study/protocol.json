@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-15",
+  "target": "Next UTC-day log RV; 5-minute returns; fixed OLS, training-only Duan smearing.",
+  "factors": [
+    "log(BTC volume yesterday / mean BTC volume over preceding 30 days, excluding yesterday)",
+    "negative 5-minute squared-return sum yesterday / yesterday RV"
+  ],
+  "models": [
+    "HAR",
+    "Factors",
+    "HAR-X"
+  ],
+  "primary_loss": "QLIKE",
+  "secondary_loss": "MSE",
+  "validation": "2024-2025; train through 2023",
+  "test": "2026-01-01 through 2026-10-11; refit through 2025",
+  "common_sample_start": "31 days after first full UTC day; all models share dates; features strictly before target day",
+  "inference": "HAC 7 lags; sensitivity 1 and 30; Holm correction for two factor coefficients; joint robust Wald",
+  "bootstrap": "5000 circular moving-block samples of paired evaluation losses, blocks 7 and 30; fixed fitted forecasts, descriptive not nested-model p-values",
+  "sensitivity": "99% target/prior-day coverage subset; training Cook influence top 1% removal (diagnostic only); 10-minute RV target rerun",
+  "stationarity": "ADF AIC and KPSS auto on training variables; inspect warnings, no automatic differencing",
+  "selection": "No tuning from diagnostics or test. All three models reported. Annual splits descriptive.",
+  "limitations": "2026 already examined: retrospective. Upbit KRW local market. Conditional associations, not causal effects. RV measurement error; no new untouched test available."
+}
