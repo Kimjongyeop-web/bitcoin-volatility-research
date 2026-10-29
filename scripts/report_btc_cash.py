@@ -101,7 +101,7 @@ nav{display:flex;gap:12px 25px;flex-wrap:wrap;font-size:14px;margin-top:22px}ul,
 εₜ = √hₜ · zₜ
 hₜ₊₁ = ω + α·εₜ² + β·hₜ</div>
 <p>h는 해당 날짜의 <strong>조건부 분산</strong>이다. ω는 기본 분산 항, α는 새 충격의 제곱에 반응하는 정도, β는 이전 위험 상태를 유지하는 정도다. α·ε² 항은 수익률의 부호를 제곱으로 지우므로 큰 상승과 큰 하락 모두 위험을 올릴 수 있다.</p>
-<p>사용자가 앞서 말한 것처럼, 학습에서 정한 α·β 등의 계수로 테스트 구간의 h를 하루씩 전진시킨다. 2026년의 실제 수익률을 하나 관측하면 그 다음 날 예측에만 사용한다. 테스트 기간 전체를 한꺼번에 보고 미리 h를 만들지 않는다.</p>
+<p>학습에서 정한 α·β 등의 계수로 테스트 구간의 h를 하루씩 전진시킨다. 2026년의 실제 수익률을 하나 관측하면 그 다음 날 예측에만 사용한다. 테스트 기간 전체를 한꺼번에 보고 미리 h를 만들지 않는다.</p>
 <p><strong>GARCH 정규</strong>는 표준화 충격 z의 분포를 정규분포로 두고, <strong>GARCH t</strong>는 꼬리가 두꺼운 Student t 분포로 둔다. t의 자유도 ν가 작을수록 극단적인 충격에 더 많은 확률을 둔다. t 모형을 쓴다고 상승·하락의 방향까지 예측해 주지는 않는다. 모형 정의는 <a href="https://econ.duke.edu/~boller/Published_Papers/joe_86.pdf">GARCH 원 논문</a>과 <a href="https://arch.readthedocs.io/en/latest/univariate/univariate_volatility_modeling.html">arch 공식 모형 설명</a>을 참고했다.</p>
 
 <h3>GJR-GARCH t: 충격의 부호에 따라 위험 반응을 달리 허용</h3>
